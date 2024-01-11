@@ -18,6 +18,5 @@ $ pip install opencv-python
 ```
 ```sh
 $ pip install pyinstaller
-```
-```
+
 
