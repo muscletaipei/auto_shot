@@ -43,7 +43,11 @@ def capture_and_save(resolution, save_path, file_format):
     
     # 檢查並設置fps（每秒幀數）
     fps = cap.get(cv2.CAP_PROP_FPS)
-    print(f"\n------------現行FPS: {fps}")
+    # print(f"\n------------現行FPS: {fps}")
+
+    # 如果fps過高，將其設置為30
+    #if fps > 30:
+    #cap.set(cv2.CAP_PROP_FPS, 30)
 
     # 拍照
     ret, frame = cap.read()
@@ -62,15 +66,27 @@ def capture_and_save(resolution, save_path, file_format):
 
     # 根據指定的文件格式進行保存
     if file_format.lower() == 'jpg':
-        cv2.imwrite(save_file_path, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 100])  # 調整 JPG 壓縮品質
+        cv2.imwrite(save_file_path, frame, [int(cv2.IMWRITE_JPEG_QUALITY), 90])  # 調整 JPG 壓縮品質
     elif file_format.lower() == 'bmp':
         cv2.imwrite(save_file_path, frame)
+
+    # count = 1
+    # while True:
+    #     if not os.path.exists(save_file_path):
+    #         break
+    #     filename = f"IQ_{resolution[0]}x{resolution[1]}_{timestr}_{count}.BMP"
+    #     save_file_path = os.path.join(save_path, filename)
+    #     count += 1
 
     cv2.imwrite(save_file_path, frame)
     
     # 檢查拍照後的resolution
     captured_resolution = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
     print(f"拍照Resolution為: {captured_resolution}")
+
+    # 顯示拍照後的圖片
+    # cv2.imshow('Captured Photo', frame)
+    # cv2.waitKey(0)  # 等待使用者按下任意鍵
 
     # 關閉相機
     cap.release()
@@ -108,6 +124,7 @@ def main():
             if saved_file:
                 saved_files.append(saved_file)
                 print(f"照片已保存到以下路徑：{resolution} {saved_file}")
+                # 等待5秒再切換resolution
                 time.sleep(2)
 
         if not saved_files:
@@ -121,7 +138,7 @@ def main():
         main()
     else:
         print("\n------------程式結束------------\n")
-    time.sleep(2)
+    time.sleep(3)
 
 if __name__ == "__main__":
     main()
