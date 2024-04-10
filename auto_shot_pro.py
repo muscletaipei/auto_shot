@@ -1,12 +1,9 @@
 import tkinter as tk
-from tkinter import Label, OptionMenu
+from tkinter import Label, OptionMenu, IntVar, Checkbutton
 from tkinter.messagebox import showinfo
 import os
 import cv2
 import time
-
-root_directory = "C:\\"
-path_photo = os.path.join(root_directory, "IQ_photo")
 
 def create_directory(directory):
     if not os.path.exists(directory):
@@ -47,19 +44,20 @@ def capture_and_save(resolution, save_path, file_format):
 
     return save_file_path
 
-def execute_capture(file_format_var):
-    
+def execute_capture(file_format_var, resolution_vars):
     output_folder = "IQ_photo"
     os.makedirs(output_folder, exist_ok=True)
     save_path = output_folder
     create_directory(save_path)
-    resolutions = [(3840, 2160), (1920, 1080), (1280, 720)]
+    
+    resolutions = [(3840, 2160), (2560, 1440), (1920, 1080), (1280, 720), (640, 360)]
+    selected_resolutions = [resolutions[i] for i, var in enumerate(resolution_vars) if var.get() == 1]
     
     file_format = 'jpg' if file_format_var == 'JPEG' else 'bmp'
     saved_files = []
 
     try:
-        for resolution in resolutions:
+        for resolution in selected_resolutions:
             saved_file = capture_and_save(resolution, save_path, file_format)
             if saved_file:
                 saved_files.append(saved_file)
@@ -71,32 +69,40 @@ def execute_capture(file_format_var):
         print(f"發生錯誤：{str(e)}")
     
     showinfo("Info", "照片拍攝完成。")
+    print("---------------------------")
     
 
 def main():
     root = tk.Tk()
-    root.geometry("400x200")
-
+    root.geometry("600x200")
     root.title("Capture Photos")
 
-    # Label for step 1
-    step1_label = Label(root, text="Step 1")
-    step1_label.place(relx=0.1,rely=0.1)
+    # Label for file format selection
+    format_label = Label(root, text="File Format:")
+    format_label.place(relx=0.1, rely=0.1)
 
     # Dropdown menu for file format options
     format_var = tk.StringVar(root)
     format_var.set("JPEG")
     format_options = ["JPEG", "BMP"]
     format_dropdown = OptionMenu(root, format_var, *format_options)
-    format_dropdown.place(relx=0.1,rely=0.2)
+    format_dropdown.place(relx=0.1, rely=0.2)
 
-    # Label for step 2
-    step2_label = Label(root, text="Step 2")
-    step2_label.place(relx=0.5,rely=0.1)
+    # Label for resolution selection
+    resolution_label = Label(root, text="Select Resolutions:")
+    resolution_label.place(relx=0.5, rely=0.1)
+
+    # Checkbuttons for resolution options
+    resolution_vars = [IntVar() for _ in range(5)]
+    resolution_texts = ["3840x2160", "2560x1440", "1920x1080", "1280x720", "640x360"]
+    for i, text in enumerate(resolution_texts):
+        resolution_checkbox = Checkbutton(root, text=text, variable=resolution_vars[i])
+        resolution_checkbox.place(relx=0.5, rely=0.2 + i*0.1)
 
     # Capture button
-    capture_button = tk.Button(root, text="Capture Photos", command=lambda: execute_capture(format_var.get()))
-    capture_button.place(relx=0.5,rely=0.2)
+    capture_button = tk.Button(root, text="Capture Photos", command=lambda: execute_capture(format_var.get(), resolution_vars))
+    capture_button.place(relx=0.8, rely=0.5)
+    print("---------------------------")
 
     root.mainloop()
 
